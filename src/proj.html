@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krisha.AI — Intelligence Driven Marketing</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Outfit:wght@200;300;400;500&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+<style>
+:root{
+  --bg:#070707;
+  --s1:#0e0e0e;
+  --s2:#141414;
+  --bd:#1c1c1c;
+  --bd2:#282828;
+  --tx:#edeae2;
+  --txm:#5c5c5c;
+  --txd:#212121;
+  --ac:#c4a97c;
+  --ac2:#8a9a6a;
+  --ac2d:#3e4d2c;
+  --F:'Syne',sans-serif;
+  --B:'Outfit',sans-serif;
+  --M:'Fira Code',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--tx);font-family:var(--B);overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cur,#cur2{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%)}
+#cur{width:8px;height:8px;background:var(--ac);transition:width .2s,height .2s}
+#cur2{width:36px;height:36px;border:1px solid rgba(196,169,124,.35);transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .3s}
+body:hover #cur2{opacity:1}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:1.6rem 5rem;transition:background .5s,backdrop-filter .5s}
+nav.stuck{background:rgba(7,7,7,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd)}
+.nav-logo{font-family:var(--F);font-weight:800;font-size:1.3rem;letter-spacing:-.03em;color:var(--tx);text-decoration:none}
+.nav-logo em{color:var(--ac);font-style:normal}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-family:var(--M);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--txm);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:var(--tx)}
+.nav-cta{font-family:var(--M);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--bg);background:var(--ac);padding:.65rem 1.6rem;text-decoration:none;transition:background .3s}
+.nav-cta:hover{background:var(--tx)}
+
+/* HERO */
+#hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:0 5rem 5.5rem;overflow:hidden}
+.h-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:90px 90px;pointer-events:none}
+.h-glow{position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(196,169,124,.06) 0%,transparent 70%);pointer-events:none}
+.h-label{font-family:var(--M);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ac);margin-bottom:2.5rem;opacity:0}
+.h-title{font-family:var(--F);font-weight:800;font-size:clamp(4.5rem,11vw,13rem);line-height:.88;letter-spacing:-.05em;overflow:visible}
+.h-line{display:block;overflow:hidden;padding-bottom:.05em}
+.h-word{display:inline-block;transform:translateY(115%)}
+.h-sub{display:flex;align-items:flex-end;justify-content:space-between;margin-top:3.5rem;opacity:0}
+.h-desc{font-family:var(--B);font-weight:200;font-size:.9rem;color:var(--txm);max-width:300px;line-height:1.8;letter-spacing:.01em}
+.h-btn{display:inline-flex;align-items:center;gap:1.2rem;font-family:var(--M);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--tx);text-decoration:none;border:1px solid var(--bd2);padding:1.1rem 2rem;transition:border-color .3s,background .3s}
+.h-btn:hover{border-color:var(--ac);background:rgba(196,169,124,.04)}
+.h-arr{display:block;width:28px;height:1px;background:var(--ac);position:relative;transition:width .4s}
+.h-btn:hover .h-arr{width:50px}
+.h-scroll{position:absolute;right:5rem;bottom:4rem;display:flex;flex-direction:column;align-items:center;gap:.8rem;opacity:0}
+.h-scroll-line{width:1px;height:70px;background:linear-gradient(to bottom,var(--ac),transparent);animation:sl 2.2s ease-in-out infinite}
+@keyframes sl{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.h-scroll-txt{font-family:var(--M);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:var(--txm);writing-mode:vertical-lr}
+.h-stats{position:absolute;right:5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2.5rem;opacity:0}
+.h-stat-n{font-family:var(--F);font-weight:800;font-size:2.2rem;color:var(--ac);line-height:1;letter-spacing:-.04em}
+.h-stat-l{font-family:var(--M);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--txm);margin-top:.2rem}
+
+/* MARQUEE */
+.mq-wrap{border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);background:var(--s1);padding:1rem 0;overflow:hidden}
+.mq-track{display:flex;gap:0;animation:mq 30s linear infinite;white-space:nowrap}
+.mq-item{font-family:var(--F);font-weight:700;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--txm);padding:0 2.5rem;border-right:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center}
+.mq-item.ac{color:var(--ac)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTION COMMONS */
+section{padding:9rem 5rem;position:relative}
+.slabel{font-family:var(--M);font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ac);margin-bottom:2.8rem;display:flex;align-items:center;gap:1rem}
+.slabel::before{content:'';display:inline-block;width:1.8rem;height:1px;background:var(--ac)}
+.stitle{font-family:var(--F);font-weight:800;font-size:clamp(2.8rem,5.5vw,5.5rem);line-height:.95;letter-spacing:-.04em}
+.rv{opacity:0;transform:translateY(36px)}
+
+/* ABOUT */
+#about{background:var(--bg)}
+.about-grid{display:grid;grid-template-columns:1fr 1.7fr;gap:7rem;margin-top:5rem;align-items:start}
+.about-left{position:sticky;top:9rem}
+.about-vision{font-family:var(--B);font-weight:300;font-size:.85rem;color:var(--txm);line-height:1.8;margin-top:1.5rem;max-width:280px}
+.pillars{display:flex;flex-direction:column;gap:1.8rem;margin-top:3.5rem}
+.pillar{border-left:1px solid var(--bd);padding-left:1.5rem;cursor:default;transition:border-color .3s}
+.pillar:hover{border-left-color:var(--ac)}
+.pillar-t{font-family:var(--F);font-weight:700;font-size:.85rem;letter-spacing:.02em;margin-bottom:.35rem}
+.pillar-d{font-family:var(--B);font-weight:300;font-size:.78rem;color:var(--txm);line-height:1.6}
+.about-right{}
+.hl-text{font-family:var(--F);font-weight:700;font-size:clamp(1.6rem,2.5vw,2.5rem);line-height:1.4;letter-spacing:-.02em}
+.hl-word{color:var(--txd);transition:color .05s;display:inline-block;margin:0 .12em}
+.hl-word.lit{color:var(--tx)}
+.approach-wrap{margin-top:4rem;padding-top:3rem;border-top:1px solid var(--bd)}
+.approach-lbl{font-family:var(--M);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--txm);margin-bottom:1.5rem}
+.approach-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+.atag{font-family:var(--M);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem .9rem;border:1px solid var(--bd);color:var(--txm);transition:all .3s;cursor:default}
+.atag:hover{border-color:var(--ac);color:var(--ac)}
+
+/* SERVICES */
+#services{background:var(--s1);padding-bottom:0}
+.srv-top{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;margin-bottom:5rem}
+.srv-desc{font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.9;max-width:380px;margin-left:auto}
+.srv-grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--bd);border-left:1px solid var(--bd)}
+.sc{border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:3rem;position:relative;overflow:hidden;cursor:default}
+.sc::before{content:'';position:absolute;inset:0;background:var(--ac);transform:translateY(101%);transition:transform .55s cubic-bezier(.76,0,.24,1);z-index:0}
+.sc:hover::before{transform:translateY(0)}
+.sc-n{font-family:var(--M);font-size:.58rem;letter-spacing:.2em;color:var(--txd);margin-bottom:2rem;position:relative;z-index:1;transition:color .4s}
+.sc-t{font-family:var(--F);font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin-bottom:.9rem;position:relative;z-index:1;transition:color .4s}
+.sc-d{font-family:var(--B);font-weight:300;font-size:.8rem;color:var(--txm);line-height:1.7;position:relative;z-index:1;transition:color .4s}
+.sc:hover .sc-n,.sc:hover .sc-t{color:var(--bg)}
+.sc:hover .sc-d{color:rgba(7,7,7,.65)}
+
+/* PACKAGES */
+#packages{background:var(--bg)}
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:4.5rem}
+.pkg{border:1px solid var(--bd);padding:3.5rem;position:relative;overflow:hidden}
+.pkg.ft{border-color:var(--ac2d);background:var(--s1)}
+.pkg-badge{font-family:var(--M);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;padding:.3rem .9rem;display:inline-block;margin-bottom:2rem;border:1px solid;transition:all .3s}
+.pkg:first-child .pkg-badge{color:var(--ac);border-color:rgba(196,169,124,.25);background:rgba(196,169,124,.06)}
+.pkg.ft .pkg-badge{color:var(--ac2);border-color:rgba(138,154,106,.3);background:rgba(138,154,106,.08)}
+.pkg-name{font-family:var(--F);font-weight:800;font-size:2.8rem;letter-spacing:-.04em;margin-bottom:.8rem}
+.pkg-tag{font-family:var(--B);font-weight:300;font-size:.85rem;color:var(--txm);line-height:1.75;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid var(--bd)}
+.pkg-list{list-style:none;display:flex;flex-direction:column;gap:.9rem}
+.pkg-li{display:flex;align-items:flex-start;gap:1rem;font-family:var(--B);font-weight:300;font-size:.82rem;color:var(--txm);line-height:1.6}
+.pkg-li::before{content:'';width:4px;height:4px;min-width:4px;background:var(--ac);border-radius:50%;margin-top:.55rem}
+.pkg-ideal{margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--bd);font-family:var(--M);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--txm)}
+
+/* PERFORMANCE */
+#perf{background:var(--s1)}
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:4rem}
+.pc{padding:3rem;border:1px solid var(--bd)}
+.pc.dk{background:var(--s2);border-color:var(--ac2d)}
+.pc-title{font-family:var(--F);font-weight:700;font-size:1.4rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--bd)}
+.pf-list{list-style:none;display:flex;flex-direction:column;gap:1.1rem}
+.pf{display:flex;align-items:flex-start;gap:1.2rem;font-family:var(--B);font-weight:300;font-size:.82rem;color:var(--txm);line-height:1.65}
+.pf::before{content:'';width:22px;min-width:22px;height:1px;background:var(--ac);margin-top:.7rem}
+.perf-note{margin-top:2rem;padding:.9rem 1.2rem;background:rgba(196,169,124,.05);border:1px solid rgba(196,169,124,.12);font-family:var(--M);font-size:.62rem;letter-spacing:.12em;color:var(--txm)}
+
+/* LEAD GEN */
+#leadgen{background:var(--bg)}
+.lg-intro{max-width:650px;margin-bottom:5rem}
+.lg-desc{font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.85;margin-top:1.5rem}
+.lg-steps{display:flex;flex-direction:column}
+.ls{display:grid;grid-template-columns:90px 1fr;gap:3rem;padding:3.5rem 0;border-bottom:1px solid var(--bd);align-items:start;position:relative}
+.ls::after{content:'';position:absolute;left:0;bottom:0;right:0;height:1px;background:var(--ac);transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.76,0,.24,1)}
+.ls:hover::after{transform:scaleX(1)}
+.ls-n{font-family:var(--F);font-weight:800;font-size:3.5rem;color:var(--txd);line-height:1;letter-spacing:-.06em;padding-top:.2rem}
+.ls-t{font-family:var(--F);font-weight:700;font-size:1.5rem;letter-spacing:-.02em;margin-bottom:1.2rem}
+.ls-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+.ls-tag{font-family:var(--M);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--txm);padding:.38rem .85rem;border:1px solid var(--bd);transition:all .3s}
+.ls:hover .ls-tag{border-color:var(--bd2)}
+
+/* WEBSITE & BRAND */
+#brand{background:var(--s1)}
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;margin-top:4rem;align-items:start}
+.brand-label{font-family:var(--M);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--txm);margin-bottom:1.5rem}
+.web-opts{display:flex;flex-direction:column;gap:.8rem;margin-top:0}
+.wopt{padding:1.8rem 2rem;border:1px solid var(--bd);font-family:var(--F);font-weight:700;font-size:1.15rem;cursor:default;transition:all .4s;position:relative;overflow:hidden}
+.wopt::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--ac);transition:width .4s}
+.wopt:hover::after{width:100%}
+.wopt:hover{background:rgba(196,169,124,.03);border-color:var(--bd2)}
+.wopt-sub{font-family:var(--B);font-weight:300;font-size:.75rem;color:var(--txm);margin-top:.4rem}
+.design-list{list-style:none;display:flex;flex-direction:column}
+.dl{display:flex;align-items:center;gap:1.5rem;font-family:var(--B);font-weight:400;font-size:.88rem;padding:1.3rem 0;border-bottom:1px solid var(--bd);color:var(--txm);transition:color .3s,padding-left .3s}
+.dl:hover{color:var(--tx);padding-left:.5rem}
+.dl-line{width:28px;height:1px;background:var(--ac);flex-shrink:0}
+
+/* CONTENT */
+#content{background:var(--bg)}
+.ct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:4rem;background:var(--bd)}
+.cc{background:var(--bg);padding:3rem;position:relative;overflow:hidden;transition:background .4s}
+.cc:hover{background:var(--s1)}
+.cc-n{font-family:var(--F);font-weight:800;font-size:5rem;color:var(--txd);line-height:1;letter-spacing:-.06em;margin-bottom:1.5rem;transition:color .4s}
+.cc:hover .cc-n{color:var(--ac)}
+.cc-t{font-family:var(--F);font-weight:700;font-size:1.25rem;margin-bottom:1.5rem}
+.cc-list{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.cc-li{font-family:var(--B);font-weight:300;font-size:.78rem;color:var(--txm);line-height:1.65;padding-left:1rem;border-left:1px solid var(--bd)}
+
+/* WHY */
+#why{background:var(--s1)}
+.why-stmt{font-family:var(--F);font-weight:800;font-size:clamp(2.2rem,4vw,4rem);letter-spacing:-.04em;line-height:1.1;max-width:800px;margin-bottom:5rem;color:var(--txm)}
+.why-stmt strong{color:var(--tx)}
+.why-rows{display:flex;flex-direction:column}
+.wr{display:grid;grid-template-columns:1fr 2fr auto;gap:4rem;align-items:center;padding:2.5rem 0;border-bottom:1px solid var(--bd);transition:padding-left .4s}
+.wr:hover{padding-left:1rem}
+.wr-t{font-family:var(--F);font-weight:700;font-size:1.15rem}
+.wr-d{font-family:var(--B);font-weight:300;font-size:.83rem;color:var(--txm);line-height:1.7}
+.wr-tag{font-family:var(--M);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--txd);white-space:nowrap;transition:color .3s}
+.wr:hover .wr-tag{color:var(--ac)}
+
+/* CLIENTS */
+#clients{background:var(--bg)}
+.cl-intro{max-width:480px;margin-bottom:5rem}
+.cl-sub{font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.85;margin-top:1.2rem}
+.cl-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--bd);border-left:1px solid var(--bd)}
+.ci{border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:3rem;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;transition:background .35s;position:relative;overflow:hidden}
+.ci::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--ac);transform:scaleX(0);transition:transform .5s cubic-bezier(.76,0,.24,1)}
+.ci:hover::before{transform:scaleX(1)}
+.ci:hover{background:var(--s1)}
+.ci-name{font-family:var(--F);font-weight:700;font-size:1rem;line-height:1.3}
+.ci-region{font-family:var(--M);font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--txm);margin-top:.8rem}
+
+/* CTA */
+#cta{background:var(--ac);padding:10rem 5rem;text-align:center;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--F);font-weight:800;font-size:18vw;color:rgba(7,7,7,.055);letter-spacing:-.06em;pointer-events:none;user-select:none;white-space:nowrap}
+.cta-lbl{font-family:var(--M);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(7,7,7,.45);margin-bottom:2rem;position:relative;z-index:1}
+.cta-t{font-family:var(--F);font-weight:800;font-size:clamp(3rem,8vw,8rem);letter-spacing:-.05em;line-height:.95;color:var(--bg);margin-bottom:2rem;position:relative;z-index:1}
+.cta-sub{font-family:var(--B);font-weight:300;font-size:.95rem;color:rgba(7,7,7,.55);max-width:480px;margin:0 auto 3rem;line-height:1.8;position:relative;z-index:1}
+.cta-btn{display:inline-flex;align-items:center;gap:1.5rem;font-family:var(--M);font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ac);background:var(--bg);padding:1.2rem 2.5rem;text-decoration:none;transition:background .3s;position:relative;z-index:1}
+.cta-btn:hover{background:#111}
+
+/* CONTACT */
+#contact{background:var(--s1);padding:9rem 5rem}
+.ct-layout{display:grid;grid-template-columns:1fr 1fr;gap:7rem;align-items:start}
+.ct-tagline{font-family:var(--F);font-weight:800;font-size:clamp(2rem,3.5vw,3.5rem);letter-spacing:-.04em;line-height:1.1}
+.ct-p{font-family:var(--B);font-weight:300;font-size:.88rem;color:var(--txm);line-height:1.85;margin-top:1.5rem}
+.ct-items{display:flex;flex-direction:column;gap:2rem}
+.ct-item{border-bottom:1px solid var(--bd);padding-bottom:1.8rem}
+.ct-ilbl{font-family:var(--M);font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--txm);margin-bottom:.7rem}
+.ct-ival{font-family:var(--F);font-weight:700;font-size:1.05rem;color:var(--tx)}
+.ct-ig{font-family:var(--F);font-weight:700;font-size:1.05rem;color:var(--ac)}
+
+/* FOOTER */
+footer{background:var(--bg);border-top:1px solid var(--bd);padding:2rem 5rem;display:flex;align-items:center;justify-content:space-between}
+.ft-logo{font-family:var(--F);font-weight:800;font-size:1rem;letter-spacing:-.03em}
+.ft-logo em{color:var(--ac);font-style:normal}
+.ft-copy,.ft-end{font-family:var(--M);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--txm)}
+
+/* REVEAL BASE */
+.rv{opacity:0;transform:translateY(38px)}
+.rv-x{opacity:0;transform:translateX(-30px)}
+.char{display:inline-block;overflow:hidden}
+.char-inner{display:inline-block;transform:translateY(115%)}
+
+@media(max-width:900px){
+  nav{padding:1.4rem 2rem}
+  section{padding:6rem 2rem}
+  #hero{padding:0 2rem 4rem}
+  .h-stats{display:none}
+  .about-grid,.srv-top,.pkg-grid,.perf-grid,.brand-grid,.ct-layout{grid-template-columns:1fr}
+  .srv-grid,.ct-grid{grid-template-columns:1fr}
+  .cl-grid{grid-template-columns:1fr 1fr}
+  .why-stmt{font-size:1.8rem}
+  .wr{grid-template-columns:1fr;gap:1rem}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Krisha<em>.AI</em></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#packages">Packages</a></li>
+    <li><a href="#clients">Clients</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="h-grid"></div>
+  <div class="h-glow"></div>
+
+  <div class="h-stats" id="hstats">
+    <div>
+      <div class="h-stat-n">10+</div>
+      <div class="h-stat-l">Services</div>
+    </div>
+    <div>
+      <div class="h-stat-n">6+</div>
+      <div class="h-stat-l">Global Clients</div>
+    </div>
+    <div>
+      <div class="h-stat-n">AI</div>
+      <div class="h-stat-l">First Strategy</div>
+    </div>
+  </div>
+
+  <p class="h-label" id="hlabel">Intelligence Driven Marketing &mdash; Visakhapatnam, India</p>
+
+  <h1 class="h-title">
+    <span class="h-line"><span class="h-word">INTELLIGENCE</span></span>
+    <span class="h-line"><span class="h-word">DRIVEN</span></span>
+    <span class="h-line"><span class="h-word" style="color:var(--ac)">MARKETING</span></span>
+  </h1>
+
+  <div class="h-sub" id="hsub">
+    <p class="h-desc">AI-powered strategies. Data-driven growth. Measurable results — built for the brands of tomorrow.</p>
+    <a href="#services" class="h-btn">
+      Explore Services
+      <span class="h-arr"></span>
+    </a>
+  </div>
+
+  <div class="h-scroll" id="hscroll">
+    <div class="h-scroll-line"></div>
+    <span class="h-scroll-txt">Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq-wrap">
+  <div class="mq-track" id="mqtrack">
+    <span class="mq-item ac">Social Media Marketing</span>
+    <span class="mq-item">Performance Marketing</span>
+    <span class="mq-item ac">AI Automation</span>
+    <span class="mq-item">Lead Generation</span>
+    <span class="mq-item ac">Website Development</span>
+    <span class="mq-item">Branding &amp; Design</span>
+    <span class="mq-item ac">Commercial Ads</span>
+    <span class="mq-item">Event Branding</span>
+    <span class="mq-item ac">WhatsApp Marketing</span>
+    <span class="mq-item">Content Production</span>
+    <!-- repeat -->
+    <span class="mq-item ac">Social Media Marketing</span>
+    <span class="mq-item">Performance Marketing</span>
+    <span class="mq-item ac">AI Automation</span>
+    <span class="mq-item">Lead Generation</span>
+    <span class="mq-item ac">Website Development</span>
+    <span class="mq-item">Branding &amp; Design</span>
+    <span class="mq-item ac">Commercial Ads</span>
+    <span class="mq-item">Event Branding</span>
+    <span class="mq-item ac">WhatsApp Marketing</span>
+    <span class="mq-item">Content Production</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="slabel">01 &mdash; Who We Are</div>
+  <div class="about-grid">
+    <div class="about-left">
+      <h2 class="stitle rv">What<br>Makes<br>Us<br>Different</h2>
+      <p class="about-vision rv">A modern intelligence-driven marketing agency engineered for the brands of tomorrow. Every campaign we build is rooted in data, powered by technology, and designed for measurable impact.</p>
+      <div class="pillars">
+        <div class="pillar rv">
+          <div class="pillar-t">AI Driven</div>
+          <div class="pillar-d">Every strategy built on intelligent systems and predictive insights.</div>
+        </div>
+        <div class="pillar rv">
+          <div class="pillar-t">Data Focused</div>
+          <div class="pillar-d">Decisions anchored in real-time data and performance metrics.</div>
+        </div>
+        <div class="pillar rv">
+          <div class="pillar-t">Result Oriented</div>
+          <div class="pillar-d">We measure success by the growth and ROI we deliver to clients.</div>
+        </div>
+        <div class="pillar rv">
+          <div class="pillar-t">Client Centric</div>
+          <div class="pillar-d">Your vision is our north star — every solution is crafted around you.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-right">
+      <div class="hl-text" id="hlpara">
+        We do not create random campaigns.
+        Every idea, every design, every video, every website,
+        and every strategy is built with a clear purpose —
+        to improve brand visibility, customer trust, and business growth.
+        We help businesses scale through a powerful fusion
+        of creative strategy, AI-powered marketing, intelligent automation,
+        precision content creation, and end-to-end business growth solutions.
+        Your vision is our north star.
+        Every solution is crafted around you.
+      </div>
+      <div class="approach-wrap">
+        <div class="approach-lbl">Our Approach</div>
+        <div class="approach-tags">
+          <span class="atag">Research</span>
+          <span class="atag">Strategy</span>
+          <span class="atag">Creative Execution</span>
+          <span class="atag">Automation</span>
+          <span class="atag">Performance Tracking</span>
+          <span class="atag">Growth Optimisation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="srv-top">
+    <div>
+      <div class="slabel">02 &mdash; Services</div>
+      <h2 class="stitle rv">A Full-Spectrum<br>Intelligence<br>Engine</h2>
+    </div>
+    <p class="srv-desc rv">From social media to AI automation, Krisha.AI delivers a complete suite of premium marketing services — each designed to drive precision growth in a competitive digital landscape.</p>
+  </div>
+
+  <div class="srv-grid">
+    <div class="sc rv">
+      <div class="sc-n">01</div>
+      <div class="sc-t">Social Media Marketing</div>
+      <div class="sc-d">Strategic content and community management across all major platforms.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">02</div>
+      <div class="sc-t">Performance Marketing</div>
+      <div class="sc-d">ROI-first paid campaigns on Meta, Google, and beyond.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">03</div>
+      <div class="sc-t">AI Automation</div>
+      <div class="sc-d">Intelligent systems that automate engagement, follow-ups, and funnels.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">04</div>
+      <div class="sc-t">Lead Generation</div>
+      <div class="sc-d">Precision-targeted campaigns engineered to convert intent into action.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">05</div>
+      <div class="sc-t">Website Development</div>
+      <div class="sc-d">High-performance, SEO-ready websites built for modern business.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">06</div>
+      <div class="sc-t">Branding &amp; Designing</div>
+      <div class="sc-d">Visual identities that command attention and build lasting recognition.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">07</div>
+      <div class="sc-t">Commercial Ads</div>
+      <div class="sc-d">Cinematic brand narratives crafted to captivate and convert.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">08</div>
+      <div class="sc-t">Event Branding</div>
+      <div class="sc-d">End-to-end visual experiences for launches, events, and campaigns.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">09</div>
+      <div class="sc-t">WhatsApp &amp; SMS Marketing</div>
+      <div class="sc-d">Direct, automated outreach that reaches customers where they are.</div>
+    </div>
+    <div class="sc rv">
+      <div class="sc-n">10</div>
+      <div class="sc-t">Content Production</div>
+      <div class="sc-d">Premium reels, visuals, and storytelling content for modern brands.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section id="packages">
+  <div class="slabel">03 &mdash; Packages</div>
+  <h2 class="stitle rv">Choose Your<br>Growth Path</h2>
+
+  <div class="pkg-grid">
+    <div class="pkg rv">
+      <span class="pkg-badge">Starter Pack</span>
+      <div class="pkg-name">Starter</div>
+      <p class="pkg-tag">The perfect launchpad for brands entering the digital space with confidence. Establish a compelling social presence with premium content and consistent strategy.</p>
+      <ul class="pkg-list">
+        <li class="pkg-li">15 Posts, Reels &amp; Festival Posts per month</li>
+        <li class="pkg-li">Full Social Media Handling across platforms</li>
+        <li class="pkg-li">Professional Posting &amp; Captions crafted for engagement</li>
+        <li class="pkg-li">Strategic Hashtag Research &amp; Optimisation</li>
+        <li class="pkg-li">Ongoing Trend Research &amp; Content Adaptation</li>
+        <li class="pkg-li">Structured Monthly Content Planning Calendar</li>
+        <li class="pkg-li">Comprehensive Monthly Reporting &amp; Analytics</li>
+      </ul>
+      <div class="pkg-ideal">Ideal for: Startups, solopreneurs &amp; emerging brands</div>
+    </div>
+
+    <div class="pkg ft rv">
+      <span class="pkg-badge">Growth Pack</span>
+      <div class="pkg-name">Growth</div>
+      <p class="pkg-tag">An elevated, full-service solution for brands ready to accelerate. Everything in the Starter Pack, amplified with deeper strategy, active community management, and dedicated growth consultation.</p>
+      <ul class="pkg-list">
+        <li class="pkg-li">20&ndash;25 Premium Reels &amp; Festival Posts per month</li>
+        <li class="pkg-li">Structured Monthly Content Calendar</li>
+        <li class="pkg-li">Strategic Campaign Planning &amp; Execution</li>
+        <li class="pkg-li">Personalised Business Growth Strategy sessions</li>
+        <li class="pkg-li">Active DM Handling &amp; Inbox Management</li>
+        <li class="pkg-li">Comment Handling &amp; Community Engagement</li>
+        <li class="pkg-li">Weekly Performance Reporting &amp; Insights</li>
+        <li class="pkg-li">Monthly Growth Discussion &amp; Strategy Review calls</li>
+      </ul>
+      <div class="pkg-ideal">Best for: Scaling businesses &amp; established brands</div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section id="perf">
+  <div class="slabel">04 &mdash; Performance Marketing</div>
+  <h2 class="stitle rv">Campaigns Optimised<br>for Measurable ROI</h2>
+  <p class="rv" style="font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.85;max-width:600px;margin-top:1.5rem">Krisha.AI's performance marketing engine leverages AI-based targeting, multi-platform campaign architecture, and real-time analytics to ensure every rupee you invest works harder and smarter.</p>
+
+  <div class="perf-grid">
+    <div class="pc rv">
+      <div class="pc-title">Basic Campaign Setup</div>
+      <ul class="pf-list">
+        <li class="pf">Meta Ads Setup &amp; Configuration</li>
+        <li class="pf">Google Ads Setup &amp; Configuration</li>
+        <li class="pf">2 Structured Campaign Architectures</li>
+        <li class="pf">In-depth Audience Research &amp; Segmentation</li>
+        <li class="pf">Conversion Tracking &amp; Pixel Integration</li>
+      </ul>
+      <div class="perf-note">Ideal for brands launching their first paid digital campaigns with precision and clarity.</div>
+    </div>
+    <div class="pc dk rv">
+      <div class="pc-title">Advanced Campaigns</div>
+      <ul class="pf-list">
+        <li class="pf">Multi-layer Campaign Funnel Architecture</li>
+        <li class="pf">AI-Based ROI Optimisation Engine</li>
+        <li class="pf">Advanced Analytics &amp; Performance Attribution</li>
+        <li class="pf">Intelligent Retargeting Strategy</li>
+        <li class="pf">Comprehensive Competitor Analysis</li>
+        <li class="pf">Data-Oriented Market Research &amp; Insights</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LEAD GEN -->
+<section id="leadgen">
+  <div class="slabel">05 &mdash; Lead Generation &amp; Automation</div>
+  <div class="lg-intro">
+    <h2 class="stitle rv">Smart Systems Built<br>for Conversions</h2>
+    <p class="lg-desc rv">From high-converting landing pages to intelligent multi-channel automation — Krisha.AI builds the infrastructure that turns your audience into a consistent, scalable revenue stream.</p>
+  </div>
+
+  <div class="lg-steps">
+    <div class="ls rv">
+      <div class="ls-n">01</div>
+      <div>
+        <div class="ls-t">Landing Page</div>
+        <div class="ls-tags">
+          <span class="ls-tag">Responsive mobile-optimised design</span>
+          <span class="ls-tag">Enquiry form integration</span>
+          <span class="ls-tag">Conversion-focused layout</span>
+        </div>
+      </div>
+    </div>
+    <div class="ls rv">
+      <div class="ls-n">02</div>
+      <div>
+        <div class="ls-t">Full Funnel Creation</div>
+        <div class="ls-tags">
+          <span class="ls-tag">CRM integration &amp; lead tracking</span>
+          <span class="ls-tag">Complete funnel architecture</span>
+          <span class="ls-tag">WhatsApp automation</span>
+        </div>
+      </div>
+    </div>
+    <div class="ls rv">
+      <div class="ls-n">03</div>
+      <div>
+        <div class="ls-t">Basic WhatsApp Automation</div>
+        <div class="ls-tags">
+          <span class="ls-tag">Automated reply systems</span>
+          <span class="ls-tag">Lead capture &amp; nurture sequences</span>
+          <span class="ls-tag">Instant engagement workflows</span>
+        </div>
+      </div>
+    </div>
+    <div class="ls rv">
+      <div class="ls-n">04</div>
+      <div>
+        <div class="ls-t">Channel Automation</div>
+        <div class="ls-tags">
+          <span class="ls-tag">WhatsApp, Instagram &amp; email integration</span>
+          <span class="ls-tag">Cross-platform reply flows</span>
+          <span class="ls-tag">Unified conversion system</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND & DESIGN -->
+<section id="brand">
+  <div class="slabel">06 &mdash; Website &amp; Brand Design</div>
+  <h2 class="stitle rv">Where Aesthetics<br>Meet Intelligence</h2>
+  <p class="rv" style="font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.85;max-width:580px;margin-top:1.5rem">Every pixel matters. Our design studio delivers luxury-grade digital experiences — from blazing-fast websites to timeless brand identities that set you apart in any market.</p>
+
+  <div class="brand-grid">
+    <div class="rv">
+      <div class="brand-label">Website Development</div>
+      <div class="web-opts">
+        <div class="wopt">
+          Landing Page
+          <div class="wopt-sub">Responsive, conversion-focused, built to perform.</div>
+        </div>
+        <div class="wopt">
+          Basic Website
+          <div class="wopt-sub">Multi-page, SEO-ready, business-focused experience.</div>
+        </div>
+        <div class="wopt">
+          Premium Website
+          <div class="wopt-sub">Full-stack, animated, luxury UI with micro-interactions.</div>
+        </div>
+      </div>
+      <p style="font-family:var(--M);font-size:.6rem;letter-spacing:.12em;color:var(--txm);margin-top:1.5rem;line-height:1.8">All websites include: Premium UI/UX design, full mobile responsiveness, SEO optimisation, modern micro-animations, fast loading speeds, and a business-focused user journey.</p>
+    </div>
+
+    <div class="rv">
+      <div class="brand-label">Designing Services</div>
+      <ul class="design-list">
+        <li class="dl"><span class="dl-line"></span>Logo Design &amp; Visual Identity Systems</li>
+        <li class="dl"><span class="dl-line"></span>Complete Brand Identity Packages</li>
+        <li class="dl"><span class="dl-line"></span>Brochure &amp; Catalogue Design</li>
+        <li class="dl"><span class="dl-line"></span>Hoardings &amp; Standee Design</li>
+        <li class="dl"><span class="dl-line"></span>Digital Branding Asset Libraries</li>
+        <li class="dl"><span class="dl-line"></span>Commercial Creative Production</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section id="content">
+  <div class="slabel">07 &mdash; Content Production</div>
+  <h2 class="stitle rv">Cinematic Storytelling<br>for Modern Brands</h2>
+  <p class="rv" style="font-family:var(--B);font-weight:300;font-size:.9rem;color:var(--txm);line-height:1.85;max-width:560px;margin-top:1.5rem">Content is currency. Krisha.AI produces premium visual content that does not just communicate — it captivates, converts, and commands attention across every platform and format.</p>
+
+  <div class="ct-grid">
+    <div class="cc rv">
+      <div class="cc-n">01</div>
+      <div class="cc-t">Premium Reels</div>
+      <ul class="cc-list">
+        <li class="cc-li">Cinematic editing &amp; colour grading</li>
+        <li class="cc-li">Trend-based creative concepts</li>
+        <li class="cc-li">AI-enhanced visual effects</li>
+        <li class="cc-li">Brand storytelling &amp; professional transitions</li>
+      </ul>
+    </div>
+    <div class="cc rv">
+      <div class="cc-n">02</div>
+      <div class="cc-t">Commercial Ads</div>
+      <ul class="cc-list">
+        <li class="cc-li">Product commercials &amp; brand promotions</li>
+        <li class="cc-li">Educational &amp; explainer ads</li>
+        <li class="cc-li">Corporate profile videos</li>
+        <li class="cc-li">High-impact short-form ad content</li>
+      </ul>
+    </div>
+    <div class="cc rv">
+      <div class="cc-n">03</div>
+      <div class="cc-t">Branding Events</div>
+      <ul class="cc-list">
+        <li class="cc-li">Professional event coverage &amp; documentation</li>
+        <li class="cc-li">Stage branding &amp; visual identity</li>
+        <li class="cc-li">Product &amp; brand launch campaigns</li>
+        <li class="cc-li">Corporate promotions &amp; activations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+  <div class="slabel">08 &mdash; Why Krisha.AI</div>
+  <p class="why-stmt rv"><strong>Not just a marketing agency.</strong> A growth intelligence partner — built for brands that refuse to be ordinary.</p>
+
+  <div class="why-rows">
+    <div class="wr rv">
+      <div class="wr-t">AI-Driven Strategy</div>
+      <div class="wr-d">Every decision is powered by machine intelligence and real-time market data. We do not guess — we engineer outcomes.</div>
+      <div class="wr-tag">Intelligence First</div>
+    </div>
+    <div class="wr rv">
+      <div class="wr-t">Data-Oriented Growth</div>
+      <div class="wr-d">Every campaign is tracked, measured, and optimised for maximum impact. If it cannot be measured, we make it measurable.</div>
+      <div class="wr-tag">Precision Focused</div>
+    </div>
+    <div class="wr rv">
+      <div class="wr-t">Creative Positioning</div>
+      <div class="wr-d">Brand narratives that resonate, differentiate, and endure. Strategy and creativity working in perfect synthesis.</div>
+      <div class="wr-tag">Story Driven</div>
+    </div>
+    <div class="wr rv">
+      <div class="wr-t">Automation &amp; Scale</div>
+      <div class="wr-d">Intelligent systems that grow with your business, 24 hours a day, 7 days a week. Your brand never sleeps.</div>
+      <div class="wr-tag">Always On</div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section id="clients">
+  <div class="slabel">09 &mdash; Trusted By</div>
+  <div class="cl-intro">
+    <h2 class="stitle rv">Our Clients</h2>
+    <p class="cl-sub rv">Proud to partner with brands across the globe that value creativity, strategy, and measurable growth.</p>
+  </div>
+
+  <div class="cl-grid">
+    <div class="ci rv">
+      <div class="ci-name">Sun International Institute of Tourism &amp; Management</div>
+      <div class="ci-region">India</div>
+    </div>
+    <div class="ci rv">
+      <div class="ci-name">Veecos Canteen Equipment</div>
+      <div class="ci-region">India</div>
+    </div>
+    <div class="ci rv">
+      <div class="ci-name">J.D Legends Bar &amp; Grill</div>
+      <div class="ci-region">USA</div>
+    </div>
+    <div class="ci rv">
+      <div class="ci-name">AHA Indian Food Paradise</div>
+      <div class="ci-region">Canada</div>
+    </div>
+    <div class="ci rv">
+      <div class="ci-name">Sandman Hotel Group</div>
+      <div class="ci-region">Canada</div>
+    </div>
+    <div class="ci rv">
+      <div class="ci-name">Plumtree Real Estate Marketing</div>
+      <div class="ci-region">USA</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-bg">SCALE</div>
+  <div class="cta-lbl">Ready to Transform</div>
+  <h2 class="cta-t rv">Your Next<br>Level Begins<br>Here</h2>
+  <p class="cta-sub rv">Book a free strategy consultation with the Krisha.AI team. We will audit your current digital presence and map out a precision growth plan tailored to your brand and business objectives.</p>
+  <a href="#contact" class="cta-btn rv">
+    Start the Conversation
+    <span style="display:block;width:28px;height:1px;background:var(--ac)"></span>
+  </a>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="slabel">10 &mdash; Get In Touch</div>
+  <div class="ct-layout">
+    <div>
+      <h2 class="ct-tagline rv">Let's Build<br>Something<br>Powerful<br>Together</h2>
+      <p class="ct-p rv">Ready to transform your brand presence with strategy, content, automation, and measurable marketing growth? Connect with Krisha.AI and let's create something remarkable.</p>
+    </div>
+    <div class="ct-items">
+      <div class="ct-item rv">
+        <div class="ct-ilbl">Phone</div>
+        <div class="ct-ival">+91 7660085111</div>
+      </div>
+      <div class="ct-item rv">
+        <div class="ct-ilbl">Email</div>
+        <div class="ct-ival">krishaai2026@gmail.com</div>
+      </div>
+      <div class="ct-item rv">
+        <div class="ct-ilbl">Location</div>
+        <div class="ct-ival">Visakhapatnam, India</div>
+      </div>
+      <div class="ct-item rv">
+        <div class="ct-ilbl">Instagram</div>
+        <div class="ct-ig">@krisha.ai_</div>
+      </div>
+      <div class="rv" style="margin-top:1rem">
+        <p style="font-family:var(--M);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--txm);line-height:1.8">Your Growth is Our Mission. We combine strategy, content, automation, and data to help brands grow with clarity and purpose.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">Krisha<em>.AI</em></div>
+  <div class="ft-copy">Intelligence Driven Marketing</div>
+  <div class="ft-end">Visakhapatnam, India &mdash; 2026</div>
+</footer>
+
+<script>
+/* ========================
+   LENIS SMOOTH SCROLL
+======================== */
+const lenis = new Lenis({
+  duration: 1.25,
+  easing: t => Math.min(1,1.001-Math.pow(2,-10*t)),
+  smoothTouch: false,
+  touchMultiplier: 2,
+});
+
+function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+requestAnimationFrame(raf);
+
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(t => lenis.raf(t*1000));
+gsap.ticker.lagSmoothing(0);
+
+gsap.registerPlugin(ScrollTrigger);
+
+/* ========================
+   CUSTOM CURSOR
+======================== */
+const cur  = document.getElementById('cur');
+const cur2 = document.getElementById('cur2');
+let mx=0, my=0, cx=0, cy=0;
+document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+(function animCur(){
+  cx += (mx-cx)*.15;
+  cy += (my-cy)*.15;
+  cur.style.transform  = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  cur2.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+  requestAnimationFrame(animCur);
+})();
+
+document.querySelectorAll('a,button,.sc,.pillar,.wopt,.ci,.ls,.wr').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cur.style.width='16px'; cur.style.height='16px';
+    cur2.style.width='60px'; cur2.style.height='60px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cur.style.width='8px'; cur.style.height='8px';
+    cur2.style.width='36px'; cur2.style.height='36px';
+  });
+});
+
+/* ========================
+   NAV SCROLL BEHAVIOR
+======================== */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', ()=>{
+  if(window.scrollY > 60) nav.classList.add('stuck');
+  else nav.classList.remove('stuck');
+},{passive:true});
+
+/* Nav smooth link */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target) lenis.scrollTo(target,{offset:-80,duration:1.6});
+  });
+});
+
+/* ========================
+   HERO ANIMATION
+======================== */
+const heroTL = gsap.timeline({delay:.2});
+heroTL
+  .to('#hlabel',{opacity:1,y:0,duration:.8,ease:'power3.out'})
+  .to('.h-word',{
+    y:'0%',
+    duration:1.1,
+    stagger:.12,
+    ease:'power4.out'
+  },'<.3')
+  .to('#hsub',{opacity:1,y:0,duration:.8,ease:'power3.out'},'<.5')
+  .to('#hscroll',{opacity:1,y:0,duration:.8,ease:'power3.out'},'<.1')
+  .to('#hstats',{opacity:1,y:0,duration:.8,ease:'power3.out'},'<.1');
+
+/* ========================
+   SCROLL-TRIGGERED WORD HIGHLIGHT
+======================== */
+function buildHighlightText(el){
+  const raw = el.textContent.trim();
+  const words = raw.split(/\s+/);
+  el.innerHTML = words.map(w=>`<span class="hl-word">${w}</span>`).join(' ');
+  const spans = el.querySelectorAll('.hl-word');
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 80%',
+    end: 'bottom 30%',
+    scrub: true,
+    onUpdate(self){
+      const progress = self.progress;
+      spans.forEach((s,i)=>{
+        const threshold = i/(spans.length-1);
+        if(progress >= threshold) s.classList.add('lit');
+        else s.classList.remove('lit');
+      });
+    }
+  });
+}
+buildHighlightText(document.getElementById('hlpara'));
+
+/* ========================
+   GENERIC SCROLL REVEALS
+======================== */
+gsap.utils.toArray('.rv').forEach(el=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.9,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger: el,
+      start: 'top 88%',
+      toggleActions: 'play none none none',
+    }
+  });
+});
+
+/* ========================
+   SERVICE CARDS STAGGER
+======================== */
+gsap.utils.toArray('.sc').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.7,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger: el,
+      start: 'top 90%',
+      toggleActions: 'play none none none',
+    },
+    delay: (i%2)*.1,
+  });
+});
+
+/* ========================
+   SECTION TITLE SPLIT REVEAL
+======================== */
+gsap.utils.toArray('.stitle').forEach(el=>{
+  const lines = el.innerHTML.split('<br>');
+  if(lines.length>1){
+    el.innerHTML = lines.map(l=>`<span class="w-1px h-line "><span class="h-word" style="display:inline-block">${l}</span></span>`).join('');
+  }
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 85%',
+    onEnter(){
+      gsap.to(el.querySelectorAll('.h-word'),{
+        y:'0%',
+        duration:1,
+        stagger:.1,
+        ease:'power4.out'
+        
+      });
+    },
+    once: true,
+  });
+});
+
+/* ========================
+   PARALLAX HERO GRID
+======================== */
+gsap.to('.h-grid',{
+  y: 80,
+  ease:'none',
+  scrollTrigger:{
+    trigger:'#hero',
+    start:'top top',
+    end:'bottom top',
+    scrub:1.5,
+  }
+});
+
+/* ========================
+   WHY SECTION LINE WIPE
+======================== */
+gsap.utils.toArray('.wr').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.7,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger: el,
+      start:'top 88%',
+      toggleActions:'play none none none',
+    },
+    delay: i*.08,
+  });
+});
+
+/* ========================
+   CLIENTS STAGGER
+======================== */
+gsap.utils.toArray('.ci').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.7,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger: el,
+      start:'top 90%',
+    },
+    delay: (i%3)*.1,
+  });
+});
+
+/* ========================
+   CONTENT CARDS
+======================== */
+gsap.utils.toArray('.cc').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.7,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger: el,
+      start:'top 88%',
+    },
+    delay: i*.12,
+  });
+});
+
+/* ========================
+   CTA BIG TEXT PARALLAX
+======================== */
+gsap.to('.cta-bg',{
+  y:-60,
+  ease:'none',
+  scrollTrigger:{
+    trigger:'#cta',
+    start:'top bottom',
+    end:'bottom top',
+    scrub:1.5,
+  }
+});
+
+/* ========================
+   MARQUEE PAUSE ON HOVER
+======================== */
+const mq = document.getElementById('mqtrack');
+mq.addEventListener('mouseenter',()=>mq.style.animationPlayState='paused');
+mq.addEventListener('mouseleave',()=>mq.style.animationPlayState='running');
+
+/* ========================
+   APPROACH TAGS STAGGER
+======================== */
+ScrollTrigger.create({
+  trigger:'.approach-tags',
+  start:'top 85%',
+  onEnter(){
+    gsap.to('.atag',{
+      opacity:1,
+      y:0,
+      duration:.5,
+      stagger:.07,
+      ease:'power3.out',
+    });
+  },
+  once:true,
+});
+gsap.set('.atag',{opacity:0,y:16});
+
+/* ========================
+   LEADGEN STEPS
+======================== */
+gsap.utils.toArray('.ls').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.8,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger:el,
+      start:'top 88%',
+    },
+    delay: i*.1,
+  });
+});
+
+/* ========================
+   PACKAGE CARDS STAGGER
+======================== */
+gsap.utils.toArray('.pkg').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.8,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger:el,
+      start:'top 88%',
+    },
+    delay: i*.15,
+  });
+});
+
+/* ========================
+   PERFORMANCE CARDS
+======================== */
+gsap.utils.toArray('.pc').forEach((el,i)=>{
+  gsap.to(el,{
+    opacity:1,
+    y:0,
+    duration:.8,
+    ease:'power3.out',
+    scrollTrigger:{
+      trigger:el,
+      start:'top 88%',
+    },
+    delay: i*.15,
+  });
+});
+
+/* ========================
+   DESIGN LIST ITEMS
+======================== */
+ScrollTrigger.create({
+  trigger:'.design-list',
+  start:'top 85%',
+  onEnter(){
+    gsap.to('.dl',{
+      opacity:1,
+      x:0,
+      duration:.6,
+      stagger:.08,
+      ease:'power3.out',
+    });
+  },
+  once:true,
+});
+gsap.set('.dl',{opacity:0,x:-20});
+
+/* ========================
+   PILLAR STAGGER
+======================== */
+ScrollTrigger.create({
+  trigger:'.pillars',
+  start:'top 85%',
+  onEnter(){
+    gsap.to('.pillar',{
+      opacity:1,
+      y:0,
+      duration:.6,
+      stagger:.1,
+      ease:'power3.out',
+    });
+  },
+  once:true,
+});
+gsap.set('.pillar',{opacity:0,y:20});
+
+/* ========================
+   CONTACT ITEMS STAGGER
+======================== */
+ScrollTrigger.create({
+  trigger:'.ct-items',
+  start:'top 85%',
+  onEnter(){
+    gsap.to('.ct-item',{
+      opacity:1,
+      y:0,
+      duration:.6,
+      stagger:.1,
+      ease:'power3.out',
+    });
+  },
+  once:true,
+});
+gsap.set('.ct-item',{opacity:0,y:24});
+
+/* ========================
+   HORIZONTAL SCROLL HINT — srv section
+======================== */
+ScrollTrigger.refresh();
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Outfit:wght@200;300;400;500&family=Fira+Code:wght@300;400&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* --- Primary Brand Colors --- */
+  --ac: #c4a97c;       /* Muted Gold (Accent) */
+  --ac2: #8a9a6a;      /* Moss Green (Secondary Accent) */
+  --ac2d: #3e4d2c;     /* Dark Moss (Deep Accent) */
+
+  /* --- Backgrounds & Surfaces --- */
+  --bg: #070707;       /* Main Deep Black */
+  --s1: #0e0e0e;       /* Surface 1 (Slightly lighter) */
+  --s2: #141414;       /* Surface 2 */
+
+  /* --- Typography --- */
+  --tx: #edeae2;       /* Primary Text (Off-white/Cream) */
+  --txm: #888888;      /* Muted Text (Medium Gray) */
+  --txd: #212121;      /* Dark Text (For light backgrounds) */
+
+  /* --- Borders & Dividers --- */
+  --bd: #1c1c1c;       /* Thin/Subtle Borders */
+  --bd2: #282828;      /* Stronger Borders/UI Elements */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Fonts */
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-outfit { font-family: 'Outfit', sans-serif; }
+.font-mono-fira { font-family: 'Fira Code', monospace; }
+
