@@ -72,7 +72,7 @@ export default function BenefitsSection() {
           transition={{ duration:0.9, ease:[0.16,1,0.3,1] }}
           style={{ marginBottom: isMobile ? "2.5rem" : "4rem" }}
         >
-          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20, borderRadius:20 }}>
             <div style={{ width:32, height:1, background:GOLD }} />
             <span style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.62rem", fontWeight:500, letterSpacing:"0.26em", textTransform:"uppercase", color:GOLD }}>Investment Benefits</span>
           </div>
@@ -95,16 +95,33 @@ export default function BenefitsSection() {
           </div>
 
           {/* Decorative image — desktop only (below on mobile) */}
-          <div ref={imgRef} style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden", marginTop: isMobile ? "2.5rem" : 0 }}>
+          <div 
+            ref={imgRef} 
+            style={{ 
+              position:"relative", 
+              aspectRatio:"4/3", 
+              overflow:"hidden", 
+              marginTop: isMobile ? "2.5rem" : 0,
+              borderRadius: 20 // Parent container rounded
+            }}
+          >
             <motion.img
               src="/benfits.png"
               alt="Texas luxury real estate"
               initial={{ scale:1.18 }}
               animate={isImgView ? { scale:1 } : {}}
               transition={{ duration:2.2, ease:[0.16,1,0.3,1] }}
-              style={{ width:"100%", height:"100%", objectFit:"cover", filter:"saturate(0.8)" }}
+              style={{ 
+                width:"100%", 
+                height:"100%", 
+                objectFit:"cover", 
+                filter:"saturate(0.8)", 
+                borderRadius:20, 
+                pointerEvents:"none", 
+                userSelect:"none" 
+              }}
             />
-            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(14,14,14,0.6) 0%, transparent 55%)", pointerEvents:"none" }} />
+            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(14,14,14,0.6) 0%, transparent 55%)", pointerEvents:"none", borderRadius: 20 }} />
             <div style={{ position:"absolute", bottom:20, left:20 }}>
               <p style={{ fontFamily:"'Instrument Serif',serif", fontStyle:"italic", fontSize:"1.1rem", color:CREAM }}>Texas · Class-A · 2026</p>
             </div>

@@ -21,7 +21,17 @@ export default function PartnershipSection() {
   const y    = useSpring(yRaw, { stiffness:80, damping:20 });
 
   return (
-    <section ref={ref} id="about" style={{ position:"relative", background:BONE, overflow:"hidden" }}>
+    <section 
+      ref={ref} 
+      id="about" 
+      style={{ 
+        position:"relative", 
+        background:BONE, 
+        overflow:"hidden",
+        borderBottomLeftRadius: 20, // Rounded bottom left
+        borderBottomRightRadius: 20  // Rounded bottom right
+      }}
+    >
 
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", minHeight: isMobile ? "auto" : "90vh" }}>
 
@@ -53,10 +63,14 @@ export default function PartnershipSection() {
             </div>
           </div>
 
-          <a href="https://www.forterraeb5.com/?#book" style={{ display:"inline-flex", alignItems:"center", gap:6, fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", fontWeight:500, color:DARK, textDecoration:"none", borderBottom:`1px solid rgba(14,14,14,0.28)`, paddingBottom:3, alignSelf:"flex-start", transition:"color 0.25s, border-color 0.25s" }}
+          <button 
+            onClick={() => {
+                document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            style={{ background: "none", border: "none", cursor: "pointer", display:"inline-flex", alignItems:"center", gap:6, fontFamily:"'DM Sans',sans-serif", fontSize:"0.82rem", fontWeight:500, color:DARK, textDecoration:"none", borderBottom:`1px solid rgba(14,14,14,0.28)`, paddingBottom:3, alignSelf:"flex-start", transition:"color 0.25s, border-color 0.25s" }}
             onMouseEnter={e=>{e.currentTarget.style.color=GOLD;e.currentTarget.style.borderBottomColor=GOLD}}
             onMouseLeave={e=>{e.currentTarget.style.color=DARK;e.currentTarget.style.borderBottomColor="rgba(14,14,14,0.28)"}}
-          >Start your journey ›</a>
+          >Start your journey ›</button>
 
           {/* Stats */}
           <div style={{ display:"flex", gap: isMobile ? "2rem" : "3rem", marginTop:"3.5rem", paddingTop:"2.5rem", borderTop:`1px solid rgba(14,14,14,0.1)`, flexWrap:"wrap" }}>
@@ -90,7 +104,16 @@ export default function PartnershipSection() {
               initial={{ opacity:0, y:40 }}
               animate={isImg ? { opacity:1, y:0 } : {}}
               transition={{ delay:0.6, duration:1.2, ease:[0.16,1,0.3,1] }}
-              style={{ position:"absolute", bottom:48, left:40, background:DARK, padding:"2.5rem 2.8rem", maxWidth:260, boxShadow:"0 40px 80px -16px rgba(0,0,0,0.4)" }}
+              style={{ 
+                position:"absolute", 
+                bottom:48, 
+                left:40, 
+                background:DARK, 
+                padding:"2.5rem 2.8rem", 
+                maxWidth:260, 
+                boxShadow:"0 40px 80px -16px rgba(0,0,0,0.4)",
+                borderRadius: 20 // Added rounding here for consistency
+              }}
             >
               <div style={{ width:24, height:1, background:GOLD, marginBottom:"1.4rem" }} />
               <p style={{ fontFamily:"'Instrument Serif',serif", fontStyle:"italic", fontSize:"1.8rem", color:CREAM, lineHeight:1.1, marginBottom:"1rem" }}>Texas<br/>Refined.</p>

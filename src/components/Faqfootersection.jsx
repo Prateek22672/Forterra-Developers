@@ -89,20 +89,57 @@ export default function FAQFooterSection() {
           <div>{FAQS.map((faq,i) => <FAQItem key={i} {...faq} index={i} inView={faqInView} />)}</div>
 
           {/* CTA block */}
-          <motion.div
-            initial={{ opacity:0, y:20 }} animate={faqInView ? { opacity:1, y:0 } : {}}
-            transition={{ duration:0.8, ease:[0.16,1,0.3,1], delay:0.5 }}
-            style={{ marginTop:"3.5rem", padding: isMobile ? "2rem" : "3rem", background:DARK, display:"flex", justifyContent:"space-between", alignItems:"center", flexDirection: isMobile ? "column" : "row", flexWrap:"wrap", gap:"1.5rem", textAlign: isMobile ? "center" : "left" }}
-          >
-            <div>
-              <p style={{ fontFamily:"'Instrument Serif',serif", fontStyle:"italic", fontSize:"1.4rem", color:CREAM, marginBottom:"0.5rem" }}>Still have questions?</p>
-              <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.88rem", fontWeight:300, color:"rgba(232,229,216,0.52)" }}>Our EB-5 specialists are available to guide you.</p>
-            </div>
-            <a href="mailto:info@forterradev.com" style={{ display:"inline-flex", alignItems:"center", gap:8, background:GOLD, color:DARK, fontFamily:"'DM Sans',sans-serif", fontSize:"0.78rem", fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", padding:"14px 28px", textDecoration:"none", transition:"background 0.25s", whiteSpace:"nowrap" }}
-              onMouseEnter={e=>e.currentTarget.style.background="#e0b97c"}
-              onMouseLeave={e=>e.currentTarget.style.background=GOLD}
-            >Contact a Specialist →</a>
-          </motion.div>
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={faqInView ? { opacity: 1, y: 0 } : {}}
+  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+  style={{ 
+    borderRadius: 20, // Applied here
+    marginTop: "3.5rem", 
+    padding: isMobile ? "2rem" : "3rem", 
+    background: DARK, 
+    display: "flex", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    flexDirection: isMobile ? "column" : "row", 
+    flexWrap: "wrap", 
+    gap: "1.5rem", 
+    textAlign: isMobile ? "center" : "left" 
+  }}
+>
+  <div>
+    <p style={{ fontFamily: "'Instrument Serif',serif", fontStyle: "italic", fontSize: "1.4rem", color: CREAM, marginBottom: "0.5rem" }}>
+      Still have questions?
+    </p>
+    <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.88rem", fontWeight: 300, color: "rgba(232,229,216,0.52)" }}>
+      Our EB-5 specialists are available to guide you.
+    </p>
+  </div>
+  <a 
+    href="mailto:info@forterradev.com" 
+    style={{ 
+      display: "inline-flex", 
+      alignItems: "center", 
+      gap: 8, 
+      background: GOLD, 
+      color: DARK, 
+      fontFamily: "'DM Sans',sans-serif", 
+      fontSize: "0.78rem", 
+      fontWeight: 600, 
+      letterSpacing: "0.12em", 
+      textTransform: "uppercase", 
+      padding: "14px 28px", 
+      borderRadius: 12, // Optional: slightly rounded button to complement the 20px block
+      textDecoration: "none", 
+      transition: "background 0.25s", 
+      whiteSpace: "nowrap" 
+    }}
+    onMouseEnter={e => e.currentTarget.style.background = "#e0b97c"}
+    onMouseLeave={e => e.currentTarget.style.background = GOLD}
+  >
+    Contact a Specialist →
+  </a>
+</motion.div>
         </div>
       </section>
 

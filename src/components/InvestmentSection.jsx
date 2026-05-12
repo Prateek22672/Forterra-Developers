@@ -185,7 +185,7 @@ export default function InvestmentSection() {
                     initial={{ scale:1.18 }}
                     animate={isImgView ? { scale:1 } : {}}
                     transition={{ duration:2.2, ease:[0.16,1,0.3,1] }}
-                    style={{ width:"100%", height:"100%", objectFit:"cover", filter:"saturate(0.85)" }}
+                    style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:8, filter:"saturate(0.85)" }}
                   />
                   <div style={{ position:"absolute", inset:0, background:`linear-gradient(to top, ${BONE}55 0%, transparent 50%)`, pointerEvents:"none" }} />
                 </div>
@@ -298,7 +298,7 @@ export default function InvestmentSection() {
                     initial={{ scale:1.12 }}
                     animate={isImgView ? { scale:1 } : {}}
                     transition={{ duration:2, ease:[0.16,1,0.3,1] }}
-                    style={{ width:"100%", height:"100%", objectFit:"cover", filter:"saturate(0.85)" }}
+                    style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:20, filter:"saturate(0.85)" }}
                   />
                   <div style={{ position:"absolute", inset:0, background:`linear-gradient(to top, ${BONE}66 0%, transparent 55%)`, pointerEvents:"none" }} />
 
@@ -319,10 +319,10 @@ export default function InvestmentSection() {
                   initial={{ opacity:0, y:24 }}
                   animate={isImgView ? { opacity:1, y:0 } : {}}
                   transition={{ delay:0.4, duration:1, ease:[0.16,1,0.3,1] }}
-                  style={{ background:DARK, padding:"2rem 2rem 1.8rem", boxShadow:"0 20px 50px -12px rgba(0,0,0,0.28)" }}
+                  style={{ background:DARK, padding:"2rem 2rem 1.8rem", borderRadius:20, boxShadow:"0 20px 50px -12px rgba(0,0,0,0.28)" }}
                 >
                   <div style={{ width:22, height:1, background:GOLD, marginBottom:"1.2rem" }} />
-                  <p style={{ fontFamily:"'Instrument Serif',serif", fontStyle:"italic", fontSize:"1.7rem", lineHeight:1.05, letterSpacing:"-0.03em", color:CREAM, marginBottom:"0.9rem" }}>
+                  <p style={{ fontFamily:"'Instrument Serif',serif", borderRadius:20, fontStyle:"italic", fontSize:"1.7rem", lineHeight:1.05, letterSpacing:"-0.03em", color:CREAM, marginBottom:"0.9rem" }}>
                     Texas <br /> Refined.
                   </p>
                   <p style={{ fontFamily:"'DM Sans',sans-serif", fontSize:"0.6rem", fontWeight:400, letterSpacing:"0.28em", textTransform:"uppercase", color:"rgba(232,229,216,0.38)", lineHeight:1.7 }}>

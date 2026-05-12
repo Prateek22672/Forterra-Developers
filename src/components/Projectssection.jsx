@@ -78,7 +78,7 @@ function ProjectCard({ project, index }) {
           initial={{ opacity:0, scale:1.05 }}
           animate={{ opacity:1, scale:1 }}
           transition={{ duration:0.55 }}
-          style={{ width:"100%", height:"100%", objectFit:"cover" }}
+          style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:12, pointerEvents:"none", userSelect:"none" }}
         />
 
         {/* EB-5 badge */}
