@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "./useIsMobile";
 
-// Maps nav label → section element ID in the DOM
 const NAV_ITEMS = [
     { label: "Our Story", id: "about" },
     { label: "EB-5 Program", id: "investment" },
@@ -13,32 +12,35 @@ const NAV_ITEMS = [
     { label: "Inquiries", id: "book" },
 ];
 
-/**
- * Scrolls smoothly to a section by ID.
- * Falls back to nothing if the element isn't found yet.
- */
 function scrollTo(id) {
     const el = document.getElementById(id);
-    if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
+/* ── Linear interpolation ──────────────────────────────── */
+function lerp(a, b, t) { return a + (b - a) * t; }
 
 export default function ForterraHero() {
     const [m, setM] = useState(false);
     const [menuOpen, setMenu] = useState(false);
     const [activeNav, setActiveNav] = useState(0);
-    const isMobile = useIsMobile(768);
-    // Small mobile: phones ≤390px wide (≈6.1 inch and below)
+    const isMobile     = useIsMobile(768);
     const isSmallMobile = useIsMobile(391);
-    const navigate = useNavigate();
+    const navigate     = useNavigate();
+
+    /* ── Refs for 3-D tilt ───────────────────────────────── */
+    const sectionRef  = useRef(null);
+    const bgRef       = useRef(null);
+    const contentRef  = useRef(null);
+    const rafRef      = useRef(null);
+    const tiltTarget  = useRef({ x: 0, y: 0 });
+    const tiltCurrent = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
         const t = setTimeout(() => setM(true), 60);
         return () => clearTimeout(t);
     }, []);
 
-    // Prevent body scroll when mobile menu is open
     useEffect(() => {
         if (menuOpen) {
             document.body.style.overflow = "hidden";
@@ -48,24 +50,85 @@ export default function ForterraHero() {
         return () => { document.body.style.overflow = ""; };
     }, [menuOpen]);
 
+    /* ── Desktop 3-D cursor parallax ────────────────────── */
+    useEffect(() => {
+        if (isMobile) return;
+        const section = sectionRef.current;
+        if (!section) return;
+
+        function onMouseMove(e) {
+            const rect = section.getBoundingClientRect();
+            // Normalise cursor to [-1, +1] within the hero
+            tiltTarget.current = {
+                x: ((e.clientX - rect.left) / rect.width)  * 2 - 1,
+                y: ((e.clientY - rect.top)  / rect.height) * 2 - 1,
+            };
+        }
+        function onMouseLeave() {
+            tiltTarget.current = { x: 0, y: 0 };
+        }
+
+        function tick() {
+            // Smooth lerp — 0.05 = very smooth; raise to 0.12 for snappier
+            const SPEED = 0.055;
+            tiltCurrent.current.x = lerp(tiltCurrent.current.x, tiltTarget.current.x, SPEED);
+            tiltCurrent.current.y = lerp(tiltCurrent.current.y, tiltTarget.current.y, SPEED);
+            const { x, y } = tiltCurrent.current;
+
+            // Background: moves opposite to cursor + subtle rotation
+            //   scale(1.06) preserved so edges never show
+            const BG_T = 20;   // px translation travel
+            const BG_R = 1.6;  // deg rotation
+            if (bgRef.current) {
+                bgRef.current.style.transform = [
+                    `scale(1.06)`,
+                    `translate(${-x * BG_T}px, ${-y * BG_T}px)`,
+                    `rotateY(${x * BG_R}deg)`,
+                    `rotateX(${-y * BG_R}deg)`,
+                ].join(" ");
+            }
+
+            // Content: drifts slightly towards cursor for depth pop
+            const CT_T = 9;    // px translation travel
+            const CT_R = 0.6;  // very subtle rotation on content
+            if (contentRef.current) {
+                contentRef.current.style.transform = [
+                    `translate(${x * CT_T}px, ${y * CT_T}px)`,
+                    `rotateY(${x * CT_R}deg)`,
+                    `rotateX(${-y * CT_R}deg)`,
+                ].join(" ");
+            }
+
+            rafRef.current = requestAnimationFrame(tick);
+        }
+
+        section.addEventListener("mousemove", onMouseMove, { passive: true });
+        section.addEventListener("mouseleave", onMouseLeave);
+        rafRef.current = requestAnimationFrame(tick);
+
+        return () => {
+            section.removeEventListener("mousemove", onMouseMove);
+            section.removeEventListener("mouseleave", onMouseLeave);
+            cancelAnimationFrame(rafRef.current);
+        };
+    }, [isMobile]);
+
     const cls = (s) => `${s}${m ? " in" : ""}`;
 
     const handleNavClick = useCallback((item, index) => {
         setActiveNav(index);
         setMenu(false);
-        // Navigate to root first (handles any sub-route), then scroll
         navigate("/");
-        // Give React a tick to render before scrolling
         setTimeout(() => scrollTo(item.id), 80);
     }, [navigate]);
 
-    // ── Mobile overlay rendered via portal so it escapes overflow:hidden ──
+    /* ── Mobile overlay portal ──────────────────────────── */
     const mobileOverlay = menuOpen && createPortal(
         <>
             <style>{`
         @keyframes fhMenuIn {
-          from { opacity:0; transform: translateY(-12px); }
-          to   { opacity:1; transform: translateY(0); }
+          from { opacity:0; transform:translateY(-12px); }
+          to   { opacity:1; transform:translateY(0); }
         }
         .fhOverlay {
           position:fixed; inset:0; z-index:9999;
@@ -73,7 +136,7 @@ export default function ForterraHero() {
           display:flex; flex-direction:column;
           padding:76px 24px 36px;
           animation:fhMenuIn 0.26s cubic-bezier(0.16,1,0.3,1);
-          overflow-y: auto;
+          overflow-y:auto;
         }
         .fhOverlayLabel {
           font-family:'DM Sans',sans-serif; font-size:0.58rem; font-weight:500;
@@ -106,8 +169,7 @@ export default function ForterraHero() {
           padding:13px 22px; border-radius:999px;
           text-decoration:none; cursor:pointer;
           transition:background 0.22s; white-space:nowrap;
-          -webkit-tap-highlight-color:transparent;
-          flex:1 1 0; min-width:0;
+          -webkit-tap-highlight-color:transparent; flex:1 1 0; min-width:0;
         }
         .fhBtnPrimaryPortal {
           display:inline-flex; align-items:center; justify-content:center; gap:7px;
@@ -117,48 +179,29 @@ export default function ForterraHero() {
           text-decoration:none; border:none; cursor:pointer;
           transition:background 0.22s, transform 0.22s;
           letter-spacing:0.02em; white-space:nowrap;
-          -webkit-tap-highlight-color:transparent;
-          flex:1 1 0; min-width:0;
+          -webkit-tap-highlight-color:transparent; flex:1 1 0; min-width:0;
         }
       `}</style>
             <div className="fhOverlay">
                 <p className="fhOverlayLabel">Menu</p>
-
                 {NAV_ITEMS.map((item, i) => (
-                    <button
-                        key={item.label}
-                        className="fhOverlayLink"
-                        onClick={() => handleNavClick(item, i)}
-                    >
+                    <button key={item.label} className="fhOverlayLink" onClick={() => handleNavClick(item, i)}>
                         {item.label}
                     </button>
                 ))}
-
                 <div className="fhOverlayDivider" />
-
                 <div style={{ display: "flex", gap: 10 }}>
-                    <a
-                        href="tel:+15122404090"
-                        className="fhBtnGhostPortal"
-                        onClick={() => setMenu(false)}
-                    >
+                    <a href="tel:+15122404090" className="fhBtnGhostPortal" onClick={() => setMenu(false)}>
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                             <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.63a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#E8E5D8" strokeWidth="1.8" strokeLinecap="round" />
                         </svg>
                         Call Us
                     </a>
-                    <button
-                        className="fhBtnPrimary"
-                        style={{ flex: "unset" }}
-                        onClick={() => handleNavClick({ id: "investment" }, -1)}
-                    >
+                    <button className="fhBtnPrimary" style={{ flex: "unset" }} onClick={() => handleNavClick({ id: "investment" }, -1)}>
                         Apply Now
                     </button>
                 </div>
-
-                <p className="fhOverlayFoot" style={{ marginTop: 32 }}>
-                    Forterra Developers · Texas EB-5 Program
-                </p>
+                <p className="fhOverlayFoot" style={{ marginTop: 32 }}>Forterra Developers · Texas EB-5 Program</p>
             </div>
         </>,
         document.body
@@ -169,48 +212,52 @@ export default function ForterraHero() {
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        :root {
-          --cream: #E8E5D8;
-          --gold:  #C9A96E;
-          --dark:  #0E0E0E;
-        }
+        :root { --cream:#E8E5D8; --gold:#C9A96E; --dark:#0E0E0E; }
 
         @keyframes fhDrift {
-          from { transform: scale(1.06) translate(0,0); }
-          to   { transform: scale(1.06) translate(-1.2%,-0.8%); }
+          from { transform:scale(1.06) translate(0,0); }
+          to   { transform:scale(1.06) translate(-1.2%,-0.8%); }
         }
         @keyframes fhNoise {
-          0%,100% { transform: translate(0,0); }
-          20%     { transform: translate(3%,1%); }
-          60%     { transform: translate(1%,-4%); }
+          0%,100% { transform:translate(0,0); }
+          20%     { transform:translate(3%,1%); }
+          60%     { transform:translate(1%,-4%); }
         }
         @keyframes fhWord {
-          from { transform: translateY(108%); }
-          to   { transform: translateY(0); }
+          from { transform:translateY(108%); }
+          to   { transform:translateY(0); }
         }
         @keyframes fhNavDrop {
-          from { opacity:0; transform: translateX(-50%) translateY(-110%); }
-          to   { opacity:1; transform: translateX(-50%) translateY(0); }
+          from { opacity:0; transform:translateX(-50%) translateY(-110%); }
+          to   { opacity:1; transform:translateX(-50%) translateY(0); }
         }
         @keyframes fhUp {
-          from { opacity:0; transform: translateY(20px); }
-          to   { opacity:1; transform: translateY(0); }
+          from { opacity:0; transform:translateY(20px); }
+          to   { opacity:1; transform:translateY(0); }
         }
-        @keyframes fhIn {
-          from { opacity:0; }
-          to   { opacity:1; }
-        }
+        @keyframes fhIn { from { opacity:0; } to { opacity:1; } }
 
+        /* ── Background image layer ──────────────────────── */
+        /* When NOT hovered: CSS drift animation runs normally.
+           When JS takes over (mouse inside), it writes inline transform
+           which naturally overrides the animation's running transform
+           because will-change promotes the element. We pause the animation
+           via a class so both don't fight each other. */
         .fhBg {
           position:absolute; inset:-5%;
-          background: url('https://images.unsplash.com/photo-1546436836-07a91091f160?w=1800&q=85') center/cover no-repeat;
-          animation: fhDrift 34s ease-in-out infinite alternate;
+          background:url('https://images.unsplash.com/photo-1546436836-07a91091f160?w=1800&q=85') center/cover no-repeat;
+          transform:scale(1.06);
+          will-change:transform;
+          transform-style:preserve-3d;
+          animation:fhDrift 34s ease-in-out infinite alternate;
         }
+        .fhHovering .fhBg { animation-play-state:paused; }
+
         .fhGrain {
           position:absolute; inset:-50%; width:200%; height:200%;
           opacity:0.35; mix-blend-mode:overlay; pointer-events:none;
           background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-          animation: fhNoise 0.15s steps(1) infinite;
+          animation:fhNoise 0.15s steps(1) infinite;
         }
 
         .fhWclip { overflow:hidden; line-height:0.82; }
@@ -219,16 +266,14 @@ export default function ForterraHero() {
           color:var(--cream); letter-spacing:-0.065em; white-space:nowrap;
           transform:translateY(108%);
         }
-        .fhMark.in { animation: fhWord 1.1s 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .fhMark.in { animation:fhWord 1.1s 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
         .fhMark sup { font-size:0.18em; vertical-align:super; letter-spacing:0; color:rgba(232,229,216,0.45); }
 
-        /* Desktop nav pill */
         .fhNav {
           position:absolute; top:0; left:50%;
-          transform:translateX(-50%) translateY(-110%);
-          opacity:0; z-index:30;
+          transform:translateX(-50%) translateY(-110%); opacity:0; z-index:30;
         }
-        .fhNav.in { animation: fhNavDrop 0.7s 1.1s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .fhNav.in { animation:fhNavDrop 0.7s 1.1s cubic-bezier(0.16,1,0.3,1) forwards; }
         .fhNavInner {
           display:flex; align-items:center; gap:26px;
           background:rgba(0,0,0,0.92); backdrop-filter:blur(16px);
@@ -241,9 +286,8 @@ export default function ForterraHero() {
           white-space:nowrap; transition:color 0.2s; padding:0;
           -webkit-tap-highlight-color:transparent;
         }
-        .fhNavBtn:hover, .fhNavBtn.on { color:var(--cream); }
+        .fhNavBtn:hover,.fhNavBtn.on { color:var(--cream); }
 
-        /* Stagger helpers */
         .fhI1{opacity:0} .fhI1.in{animation:fhIn 0.5s 1.3s ease forwards}
         .fhI2{opacity:0} .fhI2.in{animation:fhIn 0.5s 1.4s ease forwards}
         .fhU1{opacity:0} .fhU1.in{animation:fhUp 0.7s 1.1s cubic-bezier(0.16,1,0.3,1) forwards}
@@ -251,7 +295,6 @@ export default function ForterraHero() {
         .fhU3{opacity:0} .fhU3.in{animation:fhUp 0.7s 1.5s cubic-bezier(0.16,1,0.3,1) forwards}
         .fhU4{opacity:0} .fhU4.in{animation:fhUp 0.7s 1.65s cubic-bezier(0.16,1,0.3,1) forwards}
 
-        /* Buttons */
         .fhBtnPrimary {
           display:inline-flex; align-items:center; justify-content:center; gap:7px;
           background:var(--cream); color:var(--dark);
@@ -260,8 +303,7 @@ export default function ForterraHero() {
           text-decoration:none; border:none; cursor:pointer;
           transition:background 0.22s, transform 0.22s;
           letter-spacing:0.02em; white-space:nowrap;
-          -webkit-tap-highlight-color:transparent;
-          flex:1 1 0; min-width:0;
+          -webkit-tap-highlight-color:transparent; flex:1 1 0; min-width:0;
         }
         .fhBtnPrimary:hover  { background:#fff; }
         .fhBtnPrimary:active { transform:scale(0.96); }
@@ -274,40 +316,31 @@ export default function ForterraHero() {
           padding:13px 22px; border-radius:999px;
           text-decoration:none; cursor:pointer;
           transition:background 0.22s; white-space:nowrap;
-          -webkit-tap-highlight-color:transparent;
-          flex:1 1 0; min-width:0;
+          -webkit-tap-highlight-color:transparent; flex:1 1 0; min-width:0;
         }
-        .fhBtnGhost:hover  { background:rgba(255,255,255,0.18); }
+        .fhBtnGhost:hover { background:rgba(255,255,255,0.18); }
 
-        /* Small mobile button overrides */
-        .fhBtnSmall {
-          font-size:0.75rem !important;
-          padding:11px 16px !important;
-          gap:5px !important;
-        }
+        .fhBtnSmall { font-size:0.75rem !important; padding:11px 16px !important; gap:5px !important; }
 
         .fhBtnOutline {
           display:inline-flex; align-items:center; justify-content:center; gap:8px;
           background:transparent;
           border:1px solid rgba(232,229,216,0.28); color:rgba(232,229,216,0.75);
           font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:400;
-          padding:10px 20px; border-radius:999px;
-          text-decoration:none; cursor:pointer;
+          padding:10px 20px; border-radius:999px; text-decoration:none; cursor:pointer;
           transition:border-color 0.22s, color 0.22s;
           white-space:nowrap; letter-spacing:0.02em;
           -webkit-tap-highlight-color:transparent; align-self:flex-start;
         }
-        .fhBtnOutline:hover  { border-color:rgba(232,229,216,0.55); color:var(--cream); }
+        .fhBtnOutline:hover { border-color:rgba(232,229,216,0.55); color:var(--cream); }
 
-        /* Desktop pill CTA */
         .fhCta {
           display:inline-flex; align-items:center; gap:8px;
           background:var(--cream); color:var(--dark);
           font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:500;
           padding:5px 5px 5px 18px; border-radius:999px;
           text-decoration:none; transition:gap 0.3s, background 0.25s;
-          -webkit-tap-highlight-color:transparent; cursor:pointer;
-          border:none;
+          -webkit-tap-highlight-color:transparent; cursor:pointer; border:none;
         }
         .fhCta:hover { gap:14px; background:#fff; }
         .fhCtaIcon {
@@ -317,48 +350,58 @@ export default function ForterraHero() {
         }
         .fhCta:hover .fhCtaIcon { transform:scale(1.1); }
 
-        /* Mobile hamburger */
         .fhBurger {
           position:absolute; top:16px; right:16px; z-index:60;
           width:44px; height:44px; border-radius:10px;
-          background:rgba(0,0,0,0.65);
-          border:1px solid rgba(232,229,216,0.16);
+          background:rgba(0,0,0,0.65); border:1px solid rgba(232,229,216,0.16);
           backdrop-filter:blur(10px); cursor:pointer;
-          display:flex; flex-direction:column;
-          align-items:center; justify-content:center; gap:5px;
+          display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
           -webkit-tap-highlight-color:transparent;
         }
         .fhBurger span {
           width:18px; height:1.5px; background:var(--cream);
           border-radius:2px; display:block;
-          transition:transform 0.28s ease, opacity 0.22s;
-          transform-origin:center;
+          transition:transform 0.28s ease, opacity 0.22s; transform-origin:center;
         }
         .fhBurger.open span:nth-child(1) { transform:rotate(45deg) translate(4.5px,4.5px); }
         .fhBurger.open span:nth-child(2) { opacity:0; }
         .fhBurger.open span:nth-child(3) { transform:rotate(-45deg) translate(4.5px,-4.5px); }
+
+        /* ── 3D content wrapper (desktop only) ─────────────── */
+        .fhContent3d {
+          position:absolute; inset:0; z-index:20;
+          will-change:transform;
+          transform-style:preserve-3d;
+        }
       `}</style>
 
-            <section style={{
-                position: "relative", width: "100%", height: "100svh",
-                overflow: "hidden", borderRadius: isMobile ? 16 : 20,
-                background: "#000",
-            }}>
-                {/* Background */}
-                <div className="fhBg" />
+            {/* perspective on the outer section so child rotateX/Y look 3-D */}
+            <section
+                ref={sectionRef}
+                style={{
+                    position: "relative", width: "100%", height: "100svh",
+                    overflow: "hidden", borderRadius: isMobile ? 16 : 20,
+                    background: "#000",
+                    perspective: isMobile ? "none" : "1400px",
+                    perspectiveOrigin: "50% 50%",
+                }}
+            >
+                <div ref={bgRef} className="fhBg" />
+
+                {/* Gradient overlay */}
                 <div style={{
-                    position: "absolute", inset: 0, pointerEvents: "none",
+                    position: "absolute", inset: 0, pointerEvents: "none", zIndex: 10,
                     background: isMobile
                         ? "linear-gradient(to bottom,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.1) 25%,rgba(0,0,0,0.05) 45%,rgba(0,0,0,0.45) 62%,rgba(0,0,0,0.88) 78%,rgba(0,0,0,0.97) 100%)"
                         : "linear-gradient(to bottom,rgba(0,0,0,0.28) 0%,rgba(0,0,0,0.02) 35%,rgba(0,0,0,0.02) 50%,rgba(0,0,0,0.68) 78%,rgba(0,0,0,0.94) 100%)",
                 }} />
-                <div className="fhGrain" />
+                <div className="fhGrain" style={{ zIndex: 11 }} />
 
-                {/* ══════════════════ DESKTOP ══════════════════ */}
+                {/* ══════════════ DESKTOP ══════════════ */}
                 {!isMobile && (
                     <>
-                        {/* Logo — top left */}
-                        <div className={cls("fhI1")} style={{ position: "absolute", top: 18, left: 24, zIndex: 40 }}>
+                        {/* Static chrome — logo/nav/tag float above 3D layer so they never warp */}
+                        <div className={cls("fhI1")} style={{ position: "absolute", top: 18, left: 24, zIndex: 50 }}>
                             <img
                                 src="/white-logo.png"
                                 alt="Forterra"
@@ -369,16 +412,12 @@ export default function ForterraHero() {
                                 }}
                             />
                             <span style={{
-                                display: "none",
-                                fontFamily: "'Instrument Serif',serif", fontWeight: 400,
-                                fontSize: "1.3rem", color: "var(--cream)", letterSpacing: "-0.04em",
-                            }}>
-                                Forterra
-                            </span>
+                                display: "none", fontFamily: "'Instrument Serif',serif",
+                                fontWeight: 400, fontSize: "1.3rem", color: "var(--cream)", letterSpacing: "-0.04em",
+                            }}>Forterra</span>
                         </div>
 
-                        {/* Center nav pill — buttons instead of <a> */}
-                        <nav className={cls("fhNav")}>
+                        <nav className={cls("fhNav")} style={{ zIndex: 50 }}>
                             <div className="fhNavInner">
                                 {NAV_ITEMS.map((item, i) => (
                                     <button
@@ -392,61 +431,70 @@ export default function ForterraHero() {
                             </div>
                         </nav>
 
-                        {/* Top-right tag */}
-                        <div className={cls("fhI2")} style={{ position: "absolute", top: 22, right: 24, zIndex: 20 }}>
-                            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "black/70" }}>
+                        <div className={cls("fhI2")} style={{ position: "absolute", top: 22, right: 24, zIndex: 50 }}>
+                            <span style={{
+                                fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem",
+                                letterSpacing: "0.18em", textTransform: "uppercase",
+                                color: "rgba(232,229,216,0.45)",
+                            }}>
                                 Texas · Real Estate · USCIS
                             </span>
                         </div>
 
-                        {/* Wordmark */}
-                        <div style={{ position: "absolute", bottom: 0, left: 0, zIndex: 20 }}>
-                            <div className="fhWclip">
-                                <span className={cls("fhMark")} style={{ fontSize: "clamp(18vw,21vw,21vw)" }}>
-                                    Forterra<sup>*</sup>
-                                </span>
+                        {/* ── Moving content layer: wordmark + bottom-right copy ── */}
+                        <div ref={contentRef} className="fhContent3d">
+                            {/* Wordmark */}
+                            <div style={{ position: "absolute", bottom: 0, left: 0 }}>
+                                <div className="fhWclip">
+                                    <span className={cls("fhMark")} style={{ fontSize: "clamp(18vw,21vw,21vw)" }}>
+                                        Forterra<sup>*</sup>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Bottom-right content */}
-                        <div style={{ position: "absolute", bottom: 32, right: 28, zIndex: 20, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16, maxWidth: 410 }}>
-                            <p className={cls("fhU1")} style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "clamp(0.78rem,1.05vw,0.94rem)", fontWeight: 300, color: "rgba(232,229,216,0.7)", lineHeight: 1.65, letterSpacing: "0.01em" }}>
-                                Forterra Developers' premier Texas real estate investments provide a seamless and secure pathway to U.S. permanent residency through the EB-5 program. Secure your legacy. Build your future.
-                            </p>
-                            <div className={cls("fhU2")} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                                <a href="tel:+15122404090" className="fhBtnGhost" style={{ flex: "unset" }}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                                        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.63a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#E8E5D8" strokeWidth="1.8" strokeLinecap="round" />
-                                    </svg>
-                                    +1 (512) 240-4090
-                                </a>
-                                <button
-                                    className="fhBtnPrimary"
-                                    style={{ flex: "unset" }}
-                                    onClick={() => handleNavClick({ id: "investment" }, -1)}
-                                >
-                                    Apply Now
+                            {/* Bottom-right */}
+                            <div style={{
+                                position: "absolute", bottom: 32, right: 28,
+                                display: "flex", flexDirection: "column",
+                                alignItems: "flex-start", gap: 16, maxWidth: 410,
+                            }}>
+                                <p className={cls("fhU1")} style={{
+                                    fontFamily: "'DM Sans',sans-serif",
+                                    fontSize: "clamp(0.78rem,1.05vw,0.94rem)",
+                                    fontWeight: 300, color: "rgba(232,229,216,0.7)",
+                                    lineHeight: 1.65, letterSpacing: "0.01em",
+                                }}>
+                                    Forterra Developers' premier Texas real estate investments provide a seamless and
+                                    secure pathway to U.S. permanent residency through the EB-5 program. Secure your
+                                    legacy. Build your future.
+                                </p>
+                                <div className={cls("fhU2")} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                                    <a href="tel:+15122404090" className="fhBtnGhost" style={{ flex: "unset" }}>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.63a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#E8E5D8" strokeWidth="1.8" strokeLinecap="round" />
+                                        </svg>
+                                        +1 (512) 240-4090
+                                    </a>
+                                    <button className="fhBtnPrimary" style={{ flex: "unset" }} onClick={() => handleNavClick({ id: "investment" }, -1)}>
+                                        Apply Now
+                                    </button>
+                                </div>
+                                <button className={cls("fhCta fhU3")} onClick={() => handleNavClick({ id: "projects" }, 2)}>
+                                    View Investment Projects
+                                    <span className="fhCtaIcon">
+                                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                                            <path d="M3 8h10M9 4l4 4-4 4" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </span>
                                 </button>
                             </div>
-                            <button
-                                className={cls("fhCta fhU3")}
-                                onClick={() => handleNavClick({ id: "projects" }, 2)}
-                            >
-                                View Investment Projects
-                                <span className="fhCtaIcon">
-                                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                                        <path d="M3 8h10M9 4l4 4-4 4" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </span>
-                            </button>
                         </div>
                     </>
                 )}
 
-                {/* ══════════════════ MOBILE ══════════════════ */}
+                {/* ══════════════ MOBILE (unchanged) ══════════════ */}
                 {isMobile && (
                     <>
-                        {/* Hamburger — sits inside hero but menu is portalled out */}
                         <button
                             className={`fhBurger${menuOpen ? " open" : ""}`}
                             onClick={() => setMenu(o => !o)}
@@ -455,7 +503,6 @@ export default function ForterraHero() {
                             <span /><span /><span />
                         </button>
 
-                        {/* Logo top-left */}
                         <div className={cls("fhI1")} style={{ position: "absolute", top: 18, left: 18, zIndex: 20 }}>
                             <img
                                 src="/white-logo.png"
@@ -467,43 +514,23 @@ export default function ForterraHero() {
                                 }}
                             />
                             <span style={{
-                                display: "none",
-                                fontFamily: "'Instrument Serif',serif", fontWeight: 400,
-                                fontSize: isSmallMobile ? "0.95rem" : "1.1rem",
-                                color: "var(--cream)", letterSpacing: "-0.04em",
-                            }}>
-                                Forterra Developers
-                            </span>
+                                display: "none", fontFamily: "'Instrument Serif',serif", fontWeight: 400,
+                                fontSize: isSmallMobile ? "0.95rem" : "1.1rem", color: "var(--cream)", letterSpacing: "-0.04em",
+                            }}>Forterra Developers</span>
                         </div>
 
-                        {/* Wordmark — mid-left
-                            On small mobiles: split into two lines so it never overflows.
-                            On normal mobiles: keep single line as before.
-                        */}
                         <div style={{
                             position: "absolute",
                             top: isSmallMobile ? "36%" : "40%",
                             left: 0, zIndex: 20, pointerEvents: "none",
                         }}>
                             {isSmallMobile ? (
-                                // Two-line wordmark for small screens
                                 <>
                                     <div className="fhWclip">
-                                        <span
-                                            className={cls("fhMark")}
-                                            style={{ fontSize: "clamp(14vw,16vw,16vw)" }}
-                                        >
-                                            Forterra
-                                        </span>
+                                        <span className={cls("fhMark")} style={{ fontSize: "clamp(14vw,16vw,16vw)" }}>Forterra</span>
                                     </div>
                                     <div className="fhWclip" style={{ marginTop: "0.08em" }}>
-                                        <span
-                                            className={cls("fhMark")}
-                                            style={{
-                                                fontSize: "clamp(14vw,16vw,16vw)",
-                                                animationDelay: "0.72s",
-                                            }}
-                                        >
+                                        <span className={cls("fhMark")} style={{ fontSize: "clamp(14vw,16vw,16vw)", animationDelay: "0.72s" }}>
                                             Developers<sup>*</sup>
                                         </span>
                                     </div>
@@ -517,7 +544,6 @@ export default function ForterraHero() {
                             )}
                         </div>
 
-                        {/* Bottom content */}
                         <div style={{
                             position: "absolute",
                             bottom: isSmallMobile ? 28 : 50,
@@ -531,9 +557,7 @@ export default function ForterraHero() {
                                     fontSize: isSmallMobile ? "0.55rem" : "0.6rem",
                                     fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase",
                                     color: "rgba(232,229,216,0.45)",
-                                }}>
-                                    EB-5 Path to U.S. Residency
-                                </span>
+                                }}>EB-5 Path to U.S. Residency</span>
                             </div>
 
                             <p className={cls("fhU2")} style={{
@@ -551,17 +575,13 @@ export default function ForterraHero() {
                                 fontFamily: "'DM Sans',sans-serif",
                                 fontSize: isSmallMobile ? "0.72rem" : "0.8rem",
                                 fontWeight: 300, color: "rgba(232,229,216,0.58)",
-                                lineHeight: 1.55,
-                                marginBottom: isSmallMobile ? 14 : 20,
+                                lineHeight: 1.55, marginBottom: isSmallMobile ? 14 : 20,
                             }}>
                                 Premier Texas real estate investments — a seamless and secure pathway to U.S. permanent residency.
                             </p>
 
                             <div className={cls("fhU4")} style={{ display: "flex", gap: isSmallMobile ? 8 : 10, marginBottom: isSmallMobile ? 8 : 12 }}>
-                                <a
-                                    href="tel:+15122404090"
-                                    className={`fhBtnGhost${isSmallMobile ? " fhBtnSmall" : ""}`}
-                                >
+                                <a href="tel:+15122404090" className={`fhBtnGhost${isSmallMobile ? " fhBtnSmall" : ""}`}>
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                                         <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.63a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#E8E5D8" strokeWidth="1.8" strokeLinecap="round" />
                                     </svg>
@@ -570,23 +590,18 @@ export default function ForterraHero() {
                                 <button
                                     className={`fhBtnPrimary${isSmallMobile ? " fhBtnSmall" : ""}`}
                                     onClick={() => handleNavClick({ id: "investment" }, -1)}
-                                >
-                                    Apply Now
-                                </button>
+                                >Apply Now</button>
                             </div>
 
                             <button
                                 className={cls(`fhBtnOutline fhU4${isSmallMobile ? " fhBtnSmall" : ""}`)}
                                 onClick={() => handleNavClick({ id: "projects" }, 2)}
-                            >
-                                View Investment Projects →
-                            </button>
+                            >View Investment Projects →</button>
                         </div>
                     </>
                 )}
             </section>
 
-            {/* Portal: mobile overlay lives here, OUTSIDE the overflow:hidden section */}
             {mobileOverlay}
         </>
     );
