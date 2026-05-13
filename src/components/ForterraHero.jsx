@@ -29,6 +29,8 @@ export default function ForterraHero() {
     const [menuOpen, setMenu] = useState(false);
     const [activeNav, setActiveNav] = useState(0);
     const isMobile = useIsMobile(768);
+    // Small mobile: phones ≤390px wide (≈6.1 inch and below)
+    const isSmallMobile = useIsMobile(391);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -277,6 +279,13 @@ export default function ForterraHero() {
         }
         .fhBtnGhost:hover  { background:rgba(255,255,255,0.18); }
 
+        /* Small mobile button overrides */
+        .fhBtnSmall {
+          font-size:0.75rem !important;
+          padding:11px 16px !important;
+          gap:5px !important;
+        }
+
         .fhBtnOutline {
           display:inline-flex; align-items:center; justify-content:center; gap:8px;
           background:transparent;
@@ -451,7 +460,7 @@ export default function ForterraHero() {
                             <img
                                 src="/white-logo.png"
                                 alt="Forterra Developers"
-                                style={{ height: 28, width: "auto", objectFit: "contain" }}
+                                style={{ height: isSmallMobile ? 24 : 28, width: "auto", objectFit: "contain" }}
                                 onError={e => {
                                     e.currentTarget.style.display = "none";
                                     e.currentTarget.nextSibling.style.display = "block";
@@ -460,48 +469,106 @@ export default function ForterraHero() {
                             <span style={{
                                 display: "none",
                                 fontFamily: "'Instrument Serif',serif", fontWeight: 400,
-                                fontSize: "1.1rem", color: "var(--cream)", letterSpacing: "-0.04em",
+                                fontSize: isSmallMobile ? "0.95rem" : "1.1rem",
+                                color: "var(--cream)", letterSpacing: "-0.04em",
                             }}>
                                 Forterra Developers
                             </span>
                         </div>
 
-                        {/* Wordmark — mid-left */}
-                        <div style={{ position: "absolute", top: "40%", left: 0, zIndex: 20, pointerEvents: "none" }}>
-                            <div className="fhWclip">
-                                <span className={cls("fhMark")} style={{ fontSize: "clamp(16vw,18vw,18vw)" }}>
-                                    Forterra Developers<sup>*</sup>
-                                </span>
-                            </div>
+                        {/* Wordmark — mid-left
+                            On small mobiles: split into two lines so it never overflows.
+                            On normal mobiles: keep single line as before.
+                        */}
+                        <div style={{
+                            position: "absolute",
+                            top: isSmallMobile ? "36%" : "40%",
+                            left: 0, zIndex: 20, pointerEvents: "none",
+                        }}>
+                            {isSmallMobile ? (
+                                // Two-line wordmark for small screens
+                                <>
+                                    <div className="fhWclip">
+                                        <span
+                                            className={cls("fhMark")}
+                                            style={{ fontSize: "clamp(14vw,16vw,16vw)" }}
+                                        >
+                                            Forterra
+                                        </span>
+                                    </div>
+                                    <div className="fhWclip" style={{ marginTop: "0.08em" }}>
+                                        <span
+                                            className={cls("fhMark")}
+                                            style={{
+                                                fontSize: "clamp(14vw,16vw,16vw)",
+                                                animationDelay: "0.72s",
+                                            }}
+                                        >
+                                            Developers<sup>*</sup>
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="fhWclip">
+                                    <span className={cls("fhMark")} style={{ fontSize: "clamp(16vw,18vw,18vw)" }}>
+                                        Forterra Developers<sup>*</sup>
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Bottom content */}
-                        <div style={{ position: "absolute", bottom: 50, left: 0, right: 0, zIndex: 20, padding: "28px 20px 28px" }}>
-                            <div className={cls("fhU1")} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                        <div style={{
+                            position: "absolute",
+                            bottom: isSmallMobile ? 28 : 50,
+                            left: 0, right: 0, zIndex: 20,
+                            padding: isSmallMobile ? "20px 16px 20px" : "28px 20px 28px",
+                        }}>
+                            <div className={cls("fhU1")} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: isSmallMobile ? 6 : 10 }}>
                                 <span style={{ width: 20, height: 1, background: "rgba(200,169,110,0.6)", display: "inline-block" }} />
-                                <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.6rem", fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(232,229,216,0.45)" }}>
+                                <span style={{
+                                    fontFamily: "'DM Sans',sans-serif",
+                                    fontSize: isSmallMobile ? "0.55rem" : "0.6rem",
+                                    fontWeight: 500, letterSpacing: "0.22em", textTransform: "uppercase",
+                                    color: "rgba(232,229,216,0.45)",
+                                }}>
                                     EB-5 Path to U.S. Residency
                                 </span>
                             </div>
 
-                            <p className={cls("fhU2")} style={{ fontFamily: "'Instrument Serif',serif", fontSize: "1.35rem", fontWeight: 400, color: "rgba(232,229,216,0.95)", lineHeight: 1.3, letterSpacing: "-0.02em", marginBottom: 6 }}>
+                            <p className={cls("fhU2")} style={{
+                                fontFamily: "'Instrument Serif',serif",
+                                fontSize: isSmallMobile ? "1.15rem" : "1.35rem",
+                                fontWeight: 400, color: "rgba(232,229,216,0.95)",
+                                lineHeight: 1.3, letterSpacing: "-0.02em",
+                                marginBottom: isSmallMobile ? 4 : 6,
+                            }}>
                                 Secure Your Legacy,<br />
                                 <span style={{ fontStyle: "italic", color: "var(--gold)" }}>Build Your Future.</span>
                             </p>
 
-                            <p className={cls("fhU3")} style={{ fontFamily: "'DM Sans',sans-serif", fontSize: "0.8rem", fontWeight: 300, color: "rgba(232,229,216,0.58)", lineHeight: 1.6, marginBottom: 20 }}>
+                            <p className={cls("fhU3")} style={{
+                                fontFamily: "'DM Sans',sans-serif",
+                                fontSize: isSmallMobile ? "0.72rem" : "0.8rem",
+                                fontWeight: 300, color: "rgba(232,229,216,0.58)",
+                                lineHeight: 1.55,
+                                marginBottom: isSmallMobile ? 14 : 20,
+                            }}>
                                 Premier Texas real estate investments — a seamless and secure pathway to U.S. permanent residency.
                             </p>
 
-                            <div className={cls("fhU4")} style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-                                <a href="tel:+15122404090" className="fhBtnGhost">
+                            <div className={cls("fhU4")} style={{ display: "flex", gap: isSmallMobile ? 8 : 10, marginBottom: isSmallMobile ? 8 : 12 }}>
+                                <a
+                                    href="tel:+15122404090"
+                                    className={`fhBtnGhost${isSmallMobile ? " fhBtnSmall" : ""}`}
+                                >
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                                         <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.63a16 16 0 006.29 6.29l1.17-1.17a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="#E8E5D8" strokeWidth="1.8" strokeLinecap="round" />
                                     </svg>
                                     Call Us
                                 </a>
                                 <button
-                                    className="fhBtnPrimary"
+                                    className={`fhBtnPrimary${isSmallMobile ? " fhBtnSmall" : ""}`}
                                     onClick={() => handleNavClick({ id: "investment" }, -1)}
                                 >
                                     Apply Now
@@ -509,7 +576,7 @@ export default function ForterraHero() {
                             </div>
 
                             <button
-                                className={cls("fhBtnOutline fhU4")}
+                                className={cls(`fhBtnOutline fhU4${isSmallMobile ? " fhBtnSmall" : ""}`)}
                                 onClick={() => handleNavClick({ id: "projects" }, 2)}
                             >
                                 View Investment Projects →
